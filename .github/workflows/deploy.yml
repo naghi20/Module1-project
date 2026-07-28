@@ -5,59 +5,57 @@ on:
     branches: [ "main" ]
 
 permissions:
-  id-token: write # Required for secure passwordless OIDC connection 
+  id-token: write 
   contents: read
 
 env:
   AWS_REGION: "us-east-1"
-  AWS_ROLE_ARN: "arn:aws:iam::140023407747:role/github-actions-capstone-runner" # ADVICE: Use actual ARN from Step 2 output
+  AWS_ROLE_ARN: "arn:aws:iam::140023407747:role/github-actions-capstone-runner" 
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
-  
 
+# Global default directory layout so ALL steps target your app structure cleanly
+defaults:
+  run:
+    working-directory: capstone-app
 
 jobs:
   capstone-workflow:
     runs-on: ubuntu-latest
     steps:
-      # Stage 1: Checkout
       - name: 1. Checkout Source
         uses: actions/checkout@v4
 
-      # Stage 2: Unit Tests
       - name: 2. Unit Tests
-        working-directory: capstone-app
         run: mvn test
 
-      # Stage 3: Code Coverage Gate
       - name: 3. Code Coverage Validation
         run: |
           echo "Simulating code coverage tracking engine..."
-          MOCK_COVERAGE=85 # Meets the 80% coverage requirement
+          MOCK_COVERAGE=85
           if [ "$MOCK_COVERAGE" -lt 80 ]; then
             echo "❌ Quality Gate Failed: Coverage below 80%" && exit 1
           fi
 
-      # Stage 4: Security Scan
       - name: 4. Security Scan
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.35.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan-type: 'fs'
           scan-ref: '.'
-          exit-code: '0' # Logs warnings without blocking the build workspace execution
+          exit-code: '0' 
 
-      # Stage 5: Build Application
       - name: 5. Build Application
         run: mvn package -DskipTests
 
-      # Stage 6: Build Image
+      # ✅ Overrides the global subfolder so the AWS action initializes smoothly at the repo root
       - name: Authenticate with AWS via OIDC Secure Token
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+          audience: ://amazonaws.com
 
       - name: Log in to Amazon ECR
         id: login-ecr
@@ -71,14 +69,11 @@ jobs:
           docker build -t $REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA .
           echo "FINAL_IMAGE_TAG=$REGISTRY/$ECR_REPOSITORY:$COMMIT_SHA" >> $GITHUB_ENV
 
-      # Stage 7: Push to ECR
       - name: 7. Push to ECR
         run: docker push ${{ env.FINAL_IMAGE_TAG }}
 
-      # Stage 8: Deploy to EKS
       - name: 8. Deploy to EKS
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
-          # Safely deploys the application containers inside the Kubernetes runtime target
           kubectl create deployment springboot-app --image=${{ env.FINAL_IMAGE_TAG }} --dry-run=client -o yaml | kubectl apply -f -
           kubectl rollout status deployment/springboot-app --timeout=120s
