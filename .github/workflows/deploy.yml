@@ -5,12 +5,10 @@ on:
     branches: [ "main" ]
 
 permissions:
-  id-token: write 
   contents: read
 
 env:
   AWS_REGION: "us-east-1"
-  AWS_ROLE_ARN: "arn:aws:iam::140023407747:role/github-actions-capstone-runner" 
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
 
@@ -21,7 +19,14 @@ jobs:
       - name: 1. Checkout Source
         uses: actions/checkout@v4
 
-      # ADVICE: Instead of a global default, we target the capstone-app folder explicitly per step using 'working-directory'
+      # ✅ Uses your secure GitHub Secret variables instantly
+      - name: Authenticate with AWS via Safe Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: 2. Unit Tests
         working-directory: capstone-app
         run: mvn test
@@ -40,21 +45,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan-type: 'fs'
-          scan-ref: 'capstone-app' # Focuses security scanner on your code subfolder
+          scan-ref: 'capstone-app'
           exit-code: '0' 
 
       - name: 5. Build Application
         working-directory: capstone-app
         run: mvn package -DskipTests
-
-      # ✅ FIX 1: Corrected audience token to 'sts.amazonaws.com' matching our Terraform configuration
-      # ✅ FIX 2: Removed global runtime defaults so this step runs correctly at repository root
-      - name: Authenticate with AWS via OIDC Secure Token
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-          audience: sts.amazonaws.com
 
       - name: Log in to Amazon ECR
         id: login-ecr
