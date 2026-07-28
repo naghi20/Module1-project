@@ -14,11 +14,6 @@ env:
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
 
-# Global default directory layout so ALL steps target your app structure cleanly
-defaults:
-  run:
-    working-directory: capstone-app
-
 jobs:
   capstone-workflow:
     runs-on: ubuntu-latest
@@ -26,7 +21,9 @@ jobs:
       - name: 1. Checkout Source
         uses: actions/checkout@v4
 
+      # ADVICE: Instead of a global default, we target the capstone-app folder explicitly per step using 'working-directory'
       - name: 2. Unit Tests
+        working-directory: capstone-app
         run: mvn test
 
       - name: 3. Code Coverage Validation
@@ -43,25 +40,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           scan-type: 'fs'
-          scan-ref: '.'
+          scan-ref: 'capstone-app' # Focuses security scanner on your code subfolder
           exit-code: '0' 
 
       - name: 5. Build Application
+        working-directory: capstone-app
         run: mvn package -DskipTests
 
-      # ✅ Overrides the global subfolder so the AWS action initializes smoothly at the repo root
+      # ✅ FIX 1: Corrected audience token to 'sts.amazonaws.com' matching our Terraform configuration
+      # ✅ FIX 2: Removed global runtime defaults so this step runs correctly at repository root
       - name: Authenticate with AWS via OIDC Secure Token
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-          audience: ://amazonaws.com
+          audience: sts.amazonaws.com
 
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: 6. Build Image
+        working-directory: capstone-app
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           COMMIT_SHA: ${{ github.sha }}
