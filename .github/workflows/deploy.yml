@@ -14,9 +14,7 @@ env:
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
   
-defaults:
-  run:
-    working-directory: capstone-app
+
 
 jobs:
   capstone-workflow:
@@ -28,6 +26,7 @@ jobs:
 
       # Stage 2: Unit Tests
       - name: 2. Unit Tests
+        working-directory: capstone-app
         run: mvn test
 
       # Stage 3: Code Coverage Gate
