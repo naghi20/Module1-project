@@ -13,6 +13,10 @@ env:
   AWS_ROLE_ARN: "arn:aws:iam::140023407747:role/github-actions-capstone-runner" # ADVICE: Use actual ARN from Step 2 output
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
+  
+defaults:
+  run:
+    working-directory: capstone-app
 
 jobs:
   capstone-workflow:
