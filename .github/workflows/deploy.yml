@@ -9,13 +9,13 @@ env:
   AWS_ROLE_ARN: "arn:aws:iam::140023407747:role/github-actions-capstone-runner"
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
+permissions:
+  id-token: write   
+  contents: read  
 
 jobs:
   capstone-workflow:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write  
-      contents: read
     steps:
       - name: 1. Checkout Source
         uses: actions/checkout@v4
