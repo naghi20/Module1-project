@@ -24,7 +24,7 @@ resource "aws_iam_role" "github_actions_role" {
           }
           StringLike = {
             # Enforces flexible repo-level matching with a clean trailing wildcard asterisk
-            "token.actions.githubusercontent.com:sub" = "repo:naghi20/Module1-project:*"
+            "token.actions.githubusercontent.com:sub" = "repo:naghi20@64667680/Module1-project:*"
           }
         }
       }
