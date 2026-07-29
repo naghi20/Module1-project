@@ -40,7 +40,6 @@ module "vpc" {
 resource "aws_ecr_repository" "app_repo" {
   name                 = "springboot-app"
   image_tag_mutability = "MUTABLE"
-  # FIXED: Changed from force_destroy to force_delete
   force_delete         = true             
   image_scanning_configuration {
     scan_on_push = true
@@ -65,7 +64,8 @@ module "eks" {
       capacity_type  = "ON_DEMAND"
     }
   }
-  # Grant cluster permissions to the AWS Web Console root login
+
+  # Cluster entries authorizing external identities to act on internal resources
   access_entries = {
     root_console_user = {
       kubernetes_groups = []
@@ -81,8 +81,23 @@ module "eks" {
         }
       }
     }
+    # FIXED: Added the GitHub Actions Runner access entry inside the map
+    github_runner = {
+      kubernetes_groups = []
+      principal_arn     = "arn:aws:iam::140023407747:role/github-actions-capstone-runner"
+      type              = "STANDARD"
+
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
   }
-} # <-- CRITICAL FIXED: This closing bracket closes the EKS module block completely
+} 
 
 # --- 4. EXPLICIT DEPLOYMENT POLICY (Independent Resource) ---
 resource "aws_iam_policy" "github_actions_ecr_eks_policy" {
