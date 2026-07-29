@@ -1,3 +1,16 @@
+ # Module1-project
+  Complete Project Journey & Code Verification DocumentProject Specification: Module 1 Capstone (Java Spring Boot Deployment to Amazon EKS)Target Environment: AWS (VPC, IAM, KMS, ECR, EKS)Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)Infrastructure Management: Terraform v1.x / AWS Provider v5.x 
+
+  
+# 🚀 End-to-End Enterprise CI/CD Deployment Pipeline
+
+A production-grade, multi-stage automated deployment architecture. This project packages a Java Spring Boot application into a secure container, publishes it to Amazon Elastic Container Registry (ECR), rollouts live pods onto an Amazon Elastic Kubernetes Service (EKS) cluster using passwordless GitHub Actions OIDC federation, and integrates an imported ELK stack for centralized observability.
+
+---
+
+
+The orchestration environment executes a modern **8-Stage Delivery Pipeline** triggered natively on every code push to the `main` branch:
+
 ```mermaid
 graph TD
     subgraph "CI/CD Pipeline (GitHub Actions)"
@@ -21,33 +34,6 @@ graph TD
     subgraph Centralized Observability
         L -->|Streams Logs| M[Imported ELK Stack]
     end
-```
-
- # Module1-project
-  Complete Project Journey & Code Verification DocumentProject Specification: Module 1 Capstone (Java Spring Boot Deployment to Amazon EKS)Target Environment: AWS (VPC, IAM, KMS, ECR, EKS)Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)Infrastructure Management: Terraform v1.x / AWS Provider v5.x 
-
-  
-# 🚀 End-to-End Enterprise CI/CD Deployment Pipeline
-
-A production-grade, multi-stage automated deployment architecture. This project packages a Java Spring Boot application into a secure container, publishes it to Amazon Elastic Container Registry (ECR), rollouts live pods onto an Amazon Elastic Kubernetes Service (EKS) cluster using passwordless GitHub Actions OIDC federation, and integrates an imported ELK stack for centralized observability.
-
----
-
-## 🏗️ System Architecture & Workflow
-
-The orchestration environment executes a modern **8-Stage Delivery Pipeline** triggered natively on every code push to the `main` branch:
-
-```text
-[Push to main]
-      │
-      ▼
-1. Git Checkout  ─────►  2. Unit Tests (Maven)  ─────►  3. Quality Gate (80%)
-                                                                 │
-                                                                 ▼
-6. Docker Containerization ◄─── 5. Jar Package ◄─── 4. DevSecOps Scan (Trivy)
-      │
-      ▼
-7. Secure Push to Amazon ECR  ─────►  8. Rolling Deployment to Amazon EKS Pods
 ```
 
 1. **Checkout Source**: Pulls down the latest codebase state onto isolated workflow runners.
