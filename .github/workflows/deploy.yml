@@ -77,7 +77,7 @@ jobs:
           echo "FINAL_IMAGE_TAG=$REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: 7. Push to ECR
-        run: docker push ${{ env.FINAL_IMAGE_TAG }}
+        run: docker push $FINAL_IMAGE_TAG
 
       - name: 8. Deploy to EKS
         run: |
