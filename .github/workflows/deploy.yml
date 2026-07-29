@@ -84,6 +84,6 @@ jobs:
       - name: 8. Deploy to EKS
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
-          sed -i 's|__FINAL_IMAGE_TAG__|${{ env.FINAL_IMAGE_TAG }}|g' deployment.yaml
+          sed -i "s|__FINAL_IMAGE_TAG__|$FINAL_IMAGE_TAG|g" deployment.yaml
           kubectl apply -f deployment.yaml
           kubectl rollout status deployment/springboot-app --timeout=300s
