@@ -73,18 +73,27 @@ jobs:
 
       - name: 6. Build Image
         working-directory: capstone-app
+        # Fixed: Forced a total cache bust using --no-cache directly over your maven workspace
         run: |
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
-          # FIXED: Added --no-cache to force Docker to cleanly compile your code and read application.properties
           docker build --no-cache -t $REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
           echo "FINAL_IMAGE_TAG=$REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: 7. Push to ECR
-        run: docker push $FINAL_IMAGE_TAG
+        # Fixed: Explicitly wrapped into env mapping context to handle bash shell passing safely
+        env:
+          TARGET_IMAGE: ${{ env.FINAL_IMAGE_TAG }}
+        run: docker push $TARGET_IMAGE
 
       - name: 8. Deploy to EKS
+        env:
+          TARGET_IMAGE: ${{ env.FINAL_IMAGE_TAG }}
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
-          sed -i "s|__FINAL_IMAGE_TAG__|$FINAL_IMAGE_TAG|g" deployment.yaml
+          
+          # Fixed: Uses secure double-quotes to cleanly pass the environment string to sed
+          sed -i "s|__FINAL_IMAGE_TAG__|$TARGET_IMAGE|g" deployment.yaml
+          
           kubectl apply -f deployment.yaml
           kubectl rollout status deployment/springboot-app --timeout=300s
+
