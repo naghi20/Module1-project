@@ -22,16 +22,16 @@
     </properties>
     
     <dependencies>
-        <!-- Core Web Starter (Duplicates Removed) -->
+        <!-- Core Web Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         
-        <!-- Metrics and Health Endpoints for EKS Probes -->
+        <!-- FIXED: Added -starter- to expose health endpoints cleanly over the web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         
         <!-- Testing Framework Suite -->
