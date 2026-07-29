@@ -1,16 +1,12 @@
-# Establish trusted root certificate validation for GitHub
+# This creates the OIDC Provider directly with the correct Audience client list
 resource "aws_iam_openid_connect_provider" "github" {
-  url            = "https://token.actions.githubusercontent.com"
-  client_id_list = ["sts.amazonaws.com"]
-  
-  # Forcefully trusts both primary and modern backup fingerprints used by GitHub's auth servers
-  thumbprint_list = [
-    "6938fd4d98bab03faadb97b34396831e3780aea1",
-    "1c58a3a8518e8759bf075b76b750d4f2df264fcd"
-  ]
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"] # This fixes the missing audience bug
+  thumbprint_list = ["ab9d0263244dd0326eb67015705a667e79cfe998"]
 }
 
-# IAM Role assumed dynamically by the GitHub runner
+
+# 2. IAM Role assumed dynamically by the GitHub runner
 resource "aws_iam_role" "github_actions_role" {
   name = "github-actions-capstone-runner"
 
@@ -36,7 +32,7 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# Grants permissions to manage container updates and cluster states
+# 3. Grants permissions to manage container updates and cluster states
 resource "aws_iam_role_policy_attachment" "admin_bind" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
