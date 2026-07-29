@@ -28,12 +28,12 @@ jobs:
           distribution: 'temurin'       
           cache: 'maven'                
 
+      # Clean OIDC authentication handshake using your accurate Terraform role configuration
       - name: Authenticate with AWS via Safe Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-          
 
       - name: 2. Unit Tests
         working-directory: capstone-app
@@ -51,8 +51,9 @@ jobs:
             echo "::warning:: JaCoCo XML report not found at $JACOCO_FILE. Check your pom.xml plugin configuration."
           fi
 
+      # Fixed version tag pattern and pinned a highly secure release version
       - name: 4. Security Scan
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           scan-type: 'fs'
           scan-ref: 'capstone-app'
