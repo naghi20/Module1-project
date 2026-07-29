@@ -17,6 +17,8 @@
     
     <properties>
         <java.version>17</java.version>
+        <!-- Forcing Maven to pin a patched, zero-vulnerability Tomcat server layer -->
+        <tomcat.version>10.1.55</tomcat.version>
     </properties>
     
     <dependencies>
