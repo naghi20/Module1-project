@@ -5,7 +5,7 @@ metadata:
   labels:
     app: springboot-app
 spec:
-  replicas: 2 
+  replicas: 2
   selector:
     matchLabels:
       app: springboot-app
@@ -16,9 +16,17 @@ spec:
     spec:
       containers:
         - name: springboot-app
-          image: __FINAL_IMAGE_TAG__ 
+          image: __FINAL_IMAGE_TAG__ # Replaced dynamically by your pipeline
           ports:
             - containerPort: 8080
+          # Inject configurations to bypass Docker image property limitations
+          env:
+            - name: MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED
+              value: "true"
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health,info,prometheus"
+            - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+              value: "always"
           resources:
             limits:
               cpu: "500m"
@@ -26,22 +34,20 @@ spec:
             requests:
               cpu: "250m"
               memory: "256Mi"
-          # 1. Startup Probe: Holds off all other checks until Spring completely initializes
+          # Startup probe holds off liveness/readiness checks until JVM is fully initialized
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 15   # Start checking 15s after container starts
-            periodSeconds: 5          # Check every 5s
-            failureThreshold: 12      # 12 tries * 5s = Allows up to 60 seconds to boot up safely
-          # 2. Liveness Probe: Only runs AFTER the startup probe succeeds
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 10 # Gives the app 10 * 5 = 50 seconds to initialize
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
             periodSeconds: 10
-            timeoutSeconds: 3         # Gives the app 3s to respond under high load
-          # 3. Readiness Probe: Only runs AFTER the startup probe succeeds
+            timeoutSeconds: 3
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
