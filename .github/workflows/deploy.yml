@@ -9,6 +9,7 @@ permissions:
 
 env:
   AWS_REGION: "us-east-1"
+  AWS_ROLE_ARN: "arn:aws:iam::140023407747:role/github-actions-capstone-runner"
   ECR_REPOSITORY: "springboot-app"
   EKS_CLUSTER: "dev-eks-cluster"
 
@@ -23,9 +24,11 @@ jobs:
       - name: Authenticate with AWS via Safe Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+          audience: sts.amazonaws.com
+          output-env-credentials: true
+          
 
       - name: 2. Unit Tests
         working-directory: capstone-app
