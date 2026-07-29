@@ -11,9 +11,11 @@ terraform {
     }
   }
 }
+
 provider "aws" {
   region = "us-east-1"
 }
+
 # --- 1. NETWORK TOPOLOGY (VPC) ---
 module "vpc" {
   source               = "terraform-aws-modules/vpc/aws"
@@ -33,15 +35,18 @@ module "vpc" {
     "kubernetes.io/role/internal-elb" = "1"
   }
 }
+
 # --- 2. REGISTRY LAYER (ECR) ---
 resource "aws_ecr_repository" "app_repo" {
   name                 = "springboot-app"
   image_tag_mutability = "MUTABLE"
-  # Allows automatic deletion during teardown  force_destroy        = true             
+  # FIXED: Changed from force_destroy to force_delete
+  force_delete         = true             
   image_scanning_configuration {
     scan_on_push = true
   }
 }
+
 # --- 3. COMPUTE LAYER (EKS KUBERNETES) ---
 module "eks" {
   source                         = "terraform-aws-modules/eks/aws"
@@ -77,4 +82,48 @@ module "eks" {
       }
     }
   }
+} # <-- CRITICAL FIXED: This closing bracket closes the EKS module block completely
+
+# --- 4. EXPLICIT DEPLOYMENT POLICY (Independent Resource) ---
+resource "aws_iam_policy" "github_actions_ecr_eks_policy" {
+  name        = "github-actions-ecr-eks-policy"
+  description = "Grants deployment permissions to the GitHub Actions runner role"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetRepositoryPolicy",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages",
+          "ecr:BatchGetImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload",
+          "ecr:PutImage"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "eks:DescribeCluster",
+          "eks:ListClusters"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# --- 5. POLICY ATTACHMENT (Independent Resource) ---
+resource "aws_iam_role_policy_attachment" "ecr_eks_bind" {
+  role       = "github-actions-capstone-runner" 
+  policy_arn = aws_iam_policy.github_actions_ecr_eks_policy.arn
 }
