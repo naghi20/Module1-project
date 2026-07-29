@@ -75,7 +75,8 @@ jobs:
         working-directory: capstone-app
         run: |
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
-          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
+          # FIXED: Added --no-cache to force Docker to cleanly compile your code and read application.properties
+          docker build --no-cache -t $REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
           echo "FINAL_IMAGE_TAG=$REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: 7. Push to ECR
