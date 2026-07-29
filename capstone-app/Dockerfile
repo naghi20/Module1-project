@@ -14,8 +14,7 @@ FROM gcr.io/distroless/java17-debian12:latest
 WORKDIR /app
 # Copy the compiled artifact safely from the builder layer
 COPY --from=builder /build/target/springboot-app-1.0.0.jar app.jar
-# Enforce secure running conditions by defaulting to a non-root system user (built into
-distroless)
+# Enforce secure running conditions by defaulting to a non-root system user (built into distroless)
 USER nonroot:nonroot
 EXPOSE 8080
 # Execute the application binary securely
