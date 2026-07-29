@@ -1,15 +1,15 @@
 # ADVICE: Change the ID token to match your existing active EC2 server ID from AWS console
-import {
+#import {
   to = aws_instance.elk_server
   id = "i-0eb7cba4221ec302a"
 }
-resource "aws_instance" "elk_server" {
+#resource "aws_instance" "elk_server" {
   # This block placeholder forces state synchronization when you execute 'terraform plan'
   ami           = "ami-02b64aa047cb5edf5"
   instance_type = "m7i-flex.large"
 }
 # Explicit Firewall Group for your pre-constructed logging engine
-resource "aws_security_group" "elk_sg" {
+#resource "aws_security_group" "elk_sg" {
   name        = "production-elk-sg"
   description = "Accept ingress logs metrics from the new production VPC subnet"
   vpc_id      = module.vpc.vpc_id
