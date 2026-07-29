@@ -1,7 +1,6 @@
-markdown
 ```mermaid
 graph TD
-    subgraph CI/CD Pipeline (GitHub Actions)
+    subgraph "CI/CD Pipeline (GitHub Actions)"
         A[Local Dev] -->|Git Push| B(GitHub Repo)
         B --> C[1. Unit Tests]
         C --> D[2. Trivy Scan]
