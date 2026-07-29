@@ -58,6 +58,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: 'capstone-app'
           exit-code: '1' 
+          severity: 'CRITICAL'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
