@@ -1,3 +1,4 @@
+markdown
 ```mermaid
 graph TD
     subgraph CI/CD Pipeline (GitHub Actions)
