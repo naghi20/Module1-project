@@ -5,7 +5,7 @@ metadata:
   labels:
     app: springboot-app
 spec:
-  replicas: 2 # Ensures High Availability across multiple worker nodes
+  replicas: 2 
   selector:
     matchLabels:
       app: springboot-app
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: springboot-app
-          image: __FINAL_IMAGE_TAG__ # Replaced dynamically by your pipeline
+          image: __FINAL_IMAGE_TAG__ 
           ports:
             - containerPort: 8080
           resources:
@@ -26,18 +26,28 @@ spec:
             requests:
               cpu: "250m"
               memory: "256Mi"
+          # 1. Startup Probe: Holds off all other checks until Spring completely initializes
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 15   # Start checking 15s after container starts
+            periodSeconds: 5          # Check every 5s
+            failureThreshold: 12      # 12 tries * 5s = Allows up to 60 seconds to boot up safely
+          # 2. Liveness Probe: Only runs AFTER the startup probe succeeds
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 3         # Gives the app 3s to respond under high load
+          # 3. Readiness Probe: Only runs AFTER the startup probe succeeds
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
-            initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 3
 ---
 apiVersion: v1
 kind: Service
