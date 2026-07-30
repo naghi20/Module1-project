@@ -1,8 +1,12 @@
  # Module1-project
+ 
  Module 1 Capstone (Java Spring Boot Deployment to Amazon EKS)
+ 
  Target Environment: AWS (VPC, IAM, KMS, ECR, EKS)
+ 
  Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)Infrastructure
-  Management: Terraform v1.x / AWS Provider v5.x 
+ 
+ Management: Terraform v1.x / AWS Provider v5.x 
 
 ![alt text](EndtoEnd.jpg)
 
