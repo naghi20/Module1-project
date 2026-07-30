@@ -1,5 +1,10 @@
  # Module1-project
-  Complete Project Journey & Code Verification DocumentProject Specification: Module 1 Capstone (Java Spring Boot Deployment to Amazon EKS)Target Environment: AWS (VPC, IAM, KMS, ECR, EKS)Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)Infrastructure Management: Terraform v1.x / AWS Provider v5.x 
+ Module 1 Capstone (Java Spring Boot Deployment to Amazon EKS)
+ Target Environment: AWS (VPC, IAM, KMS, ECR, EKS)
+ Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)Infrastructure
+  Management: Terraform v1.x / AWS Provider v5.x 
+
+![alt text](EndtoEnd.jpg)
 
   
 # 🚀 End-to-End Enterprise CI/CD Deployment Pipeline
