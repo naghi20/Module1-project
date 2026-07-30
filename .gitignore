@@ -1,5 +1,17 @@
-**/terraform/
-.terraform/
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
+# Target build directory
+**/target/
+*.jar
+*.war
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Terraform environment ignores
+**/terraform/.terraform/
+**/terraform/*.tfstate
+**/terraform/*.tfstate.*
+**/terraform/crash.log
+
+# DO NOT ignore .terraform.lock.hcl per HashiCorp best practices
+!**/terraform/.terraform.lock.hcl
