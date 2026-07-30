@@ -39,9 +39,9 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 10
+            initialDelaySeconds: 25
             periodSeconds: 5
-            failureThreshold: 10 # 10 checks * 5s = 50s total buffer window
+            failureThreshold: 12 # 10 checks * 5s = 50s total buffer window
           # 2. Liveness Probe: Keeps checking pod vitality after startup succeeds
           livenessProbe:
             httpGet:
