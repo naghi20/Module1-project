@@ -4,9 +4,9 @@
  
  Target Environment: AWS (VPC, IAM, KMS, ECR, EKS)
  
- Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)Infrastructure
+ Automation Engine: GitHub Actions (Passwordless OpenID Connect / OIDC)
  
- Management: Terraform v1.x / AWS Provider v5.x 
+ Infrastructure Management: Terraform v1.x / AWS Provider v5.x 
 
 ![alt text](EndtoEnd.jpg)
 
