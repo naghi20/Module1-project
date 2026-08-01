@@ -1,4 +1,4 @@
- # Module1-project
+ # Module 1 - ready project 
  
  Module 1 Capstone (Java Spring Boot Deployment to Amazon EKS)
  
