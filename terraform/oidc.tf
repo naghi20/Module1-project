@@ -29,4 +29,13 @@ resource "aws_iam_role" "github_actions_role" {
       }
     ]
   })
+# 3. Grants permissions to manage container updates and cluster states
+resource "aws_iam_role_policy_attachment" "admin_bind" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+output "github_actions_role_arn" {
+  value       = aws_iam_role.github_actions_role.arn
+  description = "Copy this output value back into your GitHub actions deploy.yml configuration file."
 }
